@@ -1,0 +1,27 @@
+{
+  "name": "blog-node",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "ejs": "^3.1.5",
+    "jsonwebtoken": "^8.5.1",
+    "koa": "^2.13.0",
+    "koa-body": "^4.2.0",
+    "koa-bodyparser": "^4.3.0",
+    "koa-cors": "^0.0.16",
+    "koa-router": "^10.0.0",
+    "koa-session": "^6.1.0",
+    "koa-static": "^5.0.0",
+    "koa-views": "^7.0.0",
+    "koa2-cors": "^2.0.6",
+    "mysql": "^2.18.1",
+    "vue": "^2.6.12",
+    "vue-server-renderer": "^2.6.12"
+  }
+}
