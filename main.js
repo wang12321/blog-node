@@ -74,6 +74,7 @@ router.get('/',ctx=>{
 });
 
 router.use('/user', require('./user/index.js').routes());//配置路由
+router.use('/articles', require('./user/articles/index.js').routes());//配置路由
 
 app.use(router.routes()); // 启动路由
 app.use(router.allowedMethods());  // 如果我们不设置router.allowedMethods()在表现上除了ctx.status不会自动设置,以及response header中不会加上Allow之外,不会造成其他影响.

@@ -35,3 +35,23 @@ exports.updatePassword = ( vuale ) => {
     });
 }
 
+
+// 发布文章
+exports.insertArticles = ( value ) => {
+    let _sql = "insert into Articles set userID=?,wzbt=?,wznr=?;"
+    return mysql.exec({
+        sql: _sql,
+        params: value,
+    });
+}
+
+
+// 查询文章
+exports.selectArticles = ( value ) => {
+    let _sql = "SELECT * FROM Articles where userID = ?;"
+    return mysql.exec({
+        sql: _sql,
+        params: value,
+    });
+}
+

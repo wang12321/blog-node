@@ -95,7 +95,7 @@ router.post('/forgot', async (ctx)=>{
  * 获取用户信息
  */
 router.post('/userinfo', async (ctx)=>{
-    const data = common.gettoken(ctx.request.header.token);
+    const data = common.gettoken(ctx.request.body.token);
     await api.findUserData([data.userName]).then(async (result)=>{
         if(result && result.length !== 0){
             const premisstion = result[0].premisstion === 1 ? [1,2,3]:(result[0].premisstion === 2 ? [2,3]:[3])
