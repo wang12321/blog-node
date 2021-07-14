@@ -50,6 +50,7 @@ app.use(bodyparser());
 
 // 静态文件处理
 app.use(staticKoa('static'));
+app.use(staticKoa('public'));
 
 // 当浏览器访问服务器并发送第一次请求时，服务器端会创建一个session对象，
 // 生成一个类似于key,value的键值对， 然后将key(cookie)返回到浏览器(客户)端，

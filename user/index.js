@@ -108,4 +108,41 @@ router.post('/userinfo', async (ctx)=>{
         ctx.body = common.fhcode(0,err);
     })
 })
+router.post('/userList', async (ctx)=>{
+    const page_num = ctx.request.body.page  //当前的num
+    const page_size = ctx.request.body.rows  //当前页的数量
+    const data = common.gettoken(ctx.request.body.token);
+
+    if(ctx.request.body.userName){
+        await api.findUserListMH([data.premisstion,`%${ctx.request.body.userName}%`,(parseInt(page_num) - 1) * parseInt(page_size), parseInt(page_size)]).then(async (result)=>{
+            if(result && result.length !== 0){
+                result[0].forEach(item=>{
+                    item.zcsj = common.rTime(item.zcsj)
+                })
+                ctx.body = common.fhcode(1,"查询成功",{total:result[1][0].total,data:result[0]});
+            }else {
+                ctx.body = common.fhcode(0,"获取用户列表");
+            }
+        }).catch(err => {
+            console.log(err)
+            ctx.body = common.fhcode(0,err);
+        })
+    }else {
+        await api.findUserList([data.premisstion,(parseInt(page_num) - 1) * parseInt(page_size), parseInt(page_size)]).then(async (result)=>{
+            if(result && result.length !== 0){
+                result[0].forEach(item=>{
+                    item.zcsj = common.rTime(item.zcsj)
+                })
+                ctx.body = common.fhcode(1,"查询成功",{total:result[1][0].total,data:result[0]});
+            }else {
+                ctx.body = common.fhcode(0,"获取用户列表");
+            }
+        }).catch(err => {
+            console.log(err)
+            ctx.body = common.fhcode(0,err);
+        })
+    }
+})
+
+
 module.exports = router
