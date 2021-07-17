@@ -62,8 +62,25 @@ exports.UPDATEArticles = ( value ) => {
     });
 }
 // 查询文章all
+exports.selectArticlesAll = ( value ) => {
+    let _sql = `SELECT * FROM Articles where fbzt != 2 order by seeNum desc limit ?,?;SELECT count(*) as total FROM Articles where fbzt != 2;SELECT * FROM ArticlesZan where userid=?`
+    return mysql.exec({
+        sql: _sql,
+        params: value,
+    });
+}
+// 查询文章all ID
+exports.selectArticlesID = ( value ) => {
+    let _sql = `SELECT * FROM Articles where id = ?;SELECT * FROM ArticlesZan where userid=? and wzid=${value[0]}`
+    return mysql.exec({
+        sql: _sql,
+        params: value,
+    });
+}
+
+// 查询自己权限文章
 exports.selectArticles = ( value ) => {
-    let _sql = "SELECT * FROM Articles where userID = ? and fbzt != 2 limit ?,?;SELECT count(*) as total FROM Articles"
+    let _sql = `SELECT * FROM Articles where userID = ? and fbzt != 2 limit ?,?;SELECT count(*) as total FROM Articles where userID = ${value[0]} and fbzt != 2`
     return mysql.exec({
         sql: _sql,
         params: value,
@@ -81,7 +98,7 @@ exports.selectArticlesjz = ( value ) => {
 
 // 查询文章标题模糊
 exports.selectArticlesmh = ( value ) => {
-    let _sql = "SELECT * FROM Articles where userID = ? and wzbt like ? and fbzt != 2 limit ?,?;SELECT count(*) as total FROM Articles"
+    let _sql = `SELECT * FROM Articles where userID = ? and wzbt like ? and fbzt != 2 limit ?,?;SELECT count(*) as total FROM Articles where userID = ${value[0]} and wzbt like '${value[1]}' and fbzt != 2`
     return mysql.exec({
         sql: _sql,
         params: value,
@@ -90,7 +107,7 @@ exports.selectArticlesmh = ( value ) => {
 
 // 获取用户列表
 exports.findUserList = ( name ) => {
-    let _sql = "SELECT * FROM users where premisstion >= ? limit ?,?;SELECT count(*) as total FROM users"
+    let _sql = `SELECT * FROM users where premisstion >= ? limit ?,?;SELECT count(*) as total FROM users where premisstion >= ${name[0]}`
     return mysql.exec({
         sql: _sql,
         params: name,
@@ -98,9 +115,53 @@ exports.findUserList = ( name ) => {
 }
 // 获取用户
 exports.findUserListMH = ( name ) => {
-    let _sql = "SELECT * FROM users where premisstion >= ? and userName like ? limit ?,?;SELECT count(*) as total FROM users"
+    let _sql = `SELECT * FROM users where premisstion >= ? and userName like ? limit ?,?;SELECT count(*) as total FROM users where premisstion >= ${name[0]}  and userName like '${name[1]}'`
     return mysql.exec({
         sql: _sql,
         params: name,
+    });
+}
+
+// 点赞
+exports.insertArticlesZan = ( value ) => {
+    let _sql = "insert into ArticlesZan set userid=?,wzid=?;"
+    return mysql.exec({
+        sql: _sql,
+        params: value,
+    });
+}
+// 查询某篇文章点赞
+exports.selectArticlesZan = ( value ) => {
+    let _sql = "select * from ArticlesZan where userid=? and wzid=?"
+    return mysql.exec({
+        sql: _sql,
+        params: value,
+    });
+}
+
+
+// 留言
+exports.insertArticlesLY = ( value ) => {
+    let _sql = "insert into message set userID=?,wzid=?,lynr=?,wzuserID=?;"
+    return mysql.exec({
+        sql: _sql,
+        params: value,
+    });
+}
+// 查询某篇文章留言
+exports.selectArticlesLY = ( value ) => {
+    let _sql = "select a.*,b.userName from message a,users b where wzid=? and (sfjx = 1 or userID = ?) and a.userID=b.id  order by lysj desc limit 0,20"
+    return mysql.exec({
+        sql: _sql,
+        params: value,
+    });
+}
+
+// 查询有关用户的所有留言
+exports.selectArticlesUserGZ = ( value ) => {
+    let _sql = "select a.*,b.userName from message a,users b where wzuserID=? and a.userID=b.id  order by lysj desc limit 0,30"
+    return mysql.exec({
+        sql: _sql,
+        params: value,
     });
 }

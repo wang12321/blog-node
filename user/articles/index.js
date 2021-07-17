@@ -63,7 +63,7 @@ router.post('/updataFbzt', async (ctx)=>{
 router.post('/select', async (ctx)=>{
     const page_num = ctx.request.body.page  //当前的num
     const page_size = ctx.request.body.rows  //当前页的数量
-    const user = common.gettoken(ctx.request.body.token);
+    const user = (ctx.request.body.token && ctx.request.body.token.length !== 0) ? common.gettoken(ctx.request.body.token) : '0';
     if(ctx.request.body.wzbt){
         await api.selectArticlesmh([user.id,`%${ctx.request.body.wzbt}%`,(parseInt(page_num) - 1) * parseInt(page_size), parseInt(page_size)]).then(async (result)=>{
             result[0].forEach(item=>{
@@ -71,6 +71,25 @@ router.post('/select', async (ctx)=>{
             })
 
             ctx.body = common.fhcode(1,"查询成功",{total:result[1][0].total,data:result[0]});
+        }).catch(err => {
+            console.log(err)
+            ctx.body = common.fhcode(0,err);
+        })
+    }else if(ctx.request.body.all) {
+        await api.selectArticlesAll([(parseInt(page_num) - 1) * parseInt(page_size), parseInt(page_size),user.id]).then(async (result)=>{
+            result[0].forEach((item)=>{
+                item.fbsj = common.rTime(item.fbsj)
+                item.zantype = '0'
+                result[2].forEach((itemzan)=>{
+                    if(item.id === itemzan.wzid){
+                        item.zantype = '1'
+                    }
+                })
+            })
+
+            console.log(result)
+            ctx.body = common.fhcode(1,"查询成功",{total:result[1][0].total,data:result[0]});
+
         }).catch(err => {
             console.log(err)
             ctx.body = common.fhcode(0,err);
@@ -137,6 +156,88 @@ router.post('/UPDATEArticles', async (ctx)=>{
     const data = ctx.request.body;
     await api.UPDATEArticles([data.wzbt,data.wznr,data.wznrtext,data.fbzt,data.id]).then(async (result)=>{
         ctx.body = common.fhcode(1,"修改成功");
+    }).catch(err => {
+        console.log(err)
+        ctx.body = common.fhcode(0,err);
+    })
+})
+/**
+ * 点赞
+ */
+router.post('/zan', async (ctx)=>{
+    const data = ctx.request.body;
+    const user = common.gettoken(ctx.request.body.token);
+    await api.insertArticlesZan([user.id,data.wzid]).then(async (result)=>{
+        ctx.body = common.fhcode(1,"成功");
+    }).catch(err => {
+        console.log(err)
+        ctx.body = common.fhcode(0,err);
+    })
+})
+
+// 根据文章id 查询文章
+router.post('/ID', async (ctx)=>{
+    const data = ctx.request.body;
+    const user = (ctx.request.body.token && ctx.request.body.token.length !== 0) ? common.gettoken(ctx.request.body.token) : '0';
+    await api.selectArticlesID([data.wzid,user.id]).then(async (result)=>{
+        result[0].forEach((item)=>{
+            item.fbsj = common.rTime(item.fbsj)
+            item.zantype = '0'
+            if(result[1] && result[0].length !== 0){
+                item.zantype = '1'
+            }
+        })
+
+        console.log(result)
+        ctx.body = common.fhcode(1,"查询成功",{...result[0][0]});
+
+    }).catch(err => {
+        console.log(err)
+        ctx.body = common.fhcode(0,err);
+    })
+})
+
+
+/**
+ * 留言
+ */
+router.post('/message', async (ctx)=>{
+    const data = ctx.request.body;
+    const user = common.gettoken(ctx.request.body.token);
+    await api.insertArticlesLY([user.id,data.wzid,data.lynr,data.wzuserID]).then(async (result)=>{
+        ctx.body = common.fhcode(1,"留言成功");
+    }).catch(err => {
+        console.log(err)
+        ctx.body = common.fhcode(0,err);
+    })
+})
+
+/**
+ * 查询留言
+ */
+router.post('/selectMessage', async (ctx)=>{
+    const data = ctx.request.body;
+    const user = (ctx.request.body.token && ctx.request.body.token.length !== 0) ? common.gettoken(ctx.request.body.token) : '0';
+    await api.selectArticlesLY([data.wzid,user.id]).then(async (result)=>{
+        result.forEach((item)=>{
+            item.lysj = common.rTime(item.lysj)
+        })
+        ctx.body = common.fhcode(1,"成功", {data:result});
+    }).catch(err => {
+        console.log(err)
+        ctx.body = common.fhcode(0,err);
+    })
+})
+/**
+ * 查询留言-感知
+ */
+router.post('/messageGz', async (ctx)=>{
+    const user = (ctx.request.body.token && ctx.request.body.token.length !== 0) ? common.gettoken(ctx.request.body.token) : '0';
+    await api.selectArticlesUserGZ([user.id]).then(async (result)=>{
+        result.forEach((item)=>{
+            item.lysj = common.rTime(item.lysj)
+        })
+        ctx.body = common.fhcode(1,"成功", {data:result});
     }).catch(err => {
         console.log(err)
         ctx.body = common.fhcode(0,err);
